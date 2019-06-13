@@ -67,20 +67,26 @@ int main() {
 					count = 0;
 					continue;
 				}
-			} else if (count == 0) {
+			} else if (remain == 0) {
 				j = j + 8;
+				count = 0;
+				//printf("j: %lld\n", j);
+				break;
+			} else if (remain != 0) {
+				j = j + remain;
 				//printf("j: %lld\n", j);
 				count = 0;
 				break;
-			} else if (count > 0) {
-				j = j + (8 - j % 8) + remain;
-				//printf("j: %lld\n", j);
-				break;
 			}
 		}
-		j = keywordcaller(info, str, j);
 		hld = j;
-		remain = j % 8;
+		j = keywordcaller(info, str, j);
+		if (j == -1)
+			return 0;
+		if (j > hld)
+			remain = j % 8;
+		else if (count == 4)
+			remain = 0;
 		info[0] = '\0';
 		count = 0;
 	}
@@ -342,7 +348,7 @@ int mvhd(char *t, int ind)
 	strcat(info, tmp);
 	printf("%s\n", info);
 	printf("ind: %d\n", ind);
-	return ind + 8;
+	return ind;
 }
 
 int trak(char *t, int ind)
@@ -526,9 +532,9 @@ int elst(char *t, int ind)
 	strcat(info, tmp);
 	printf("%s\n", info);
 	printf("ind: %d\n", ind);
-	if (ind % 8 != 0) {
-		return (ind - (8 - ind % 8));
-	}
+	// if (ind % 8 != 0) {
+	// 	return (ind - (8 - ind % 8));
+	// }
 	return ind;
 }
 
@@ -536,7 +542,7 @@ int mdia(char *t, int ind)
 {
 	//layer 2
 	char info[100];
-	strcpy(info, "mdia\n");
+	strcpy(info, "Box Type: mdia\n");
 	printf("%s\n", info);
 	// printf("ind: %d\n", ind);
 	return ind + 8;
@@ -621,7 +627,7 @@ int mdhd(char *t, int ind)
 	}
 	printf("%s\n", info);
 	// printf("ind: %d\n", ind);
-	return ind + 8;
+	return ind + ((8 % ind) + 8);
 }
 
 int hdlr(char *t, int ind)
