@@ -1,0 +1,17 @@
+Box Type: ftype
+Major Brand: mp42
+Minor Versions: 
+isom
+mp42
+
+Box Type: moov
+
+Box Type: mvhd
+Box Version: 0
+Creation Time: 3484860031
+Modification Time: 3484860031
+Timescale: 600
+Duration: 3037
+Rate: 65536
+Volume: 256
+
