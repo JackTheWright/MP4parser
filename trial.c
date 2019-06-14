@@ -66,7 +66,7 @@ struct node *main()
 	FILE *fp;
 	int c;
 
-	const char *filename = "test3";
+	const char *filename = "Sample2.mp4";
 	fp = fopen(filename,"rb");
 	if (fp == NULL) {
 	    perror("Error opening file");
@@ -308,8 +308,10 @@ int mvhd(char *t, int ind)
 	int i = 0, j = 0;
 	long tmpnum;
 	if (strcmp(res[strind-1].name, " moov") != 0) {
-		holder += 2;
-		return holder;
+		strcpy(res[strind].name, info);
+		strcpy(res[strind].description, "");
+		res[strind].layer = 0;
+		strind++;
 	}
 	strcpy(info, " mvhd");
 	strcpy(res[strind].name, info);
@@ -549,8 +551,7 @@ int tref(char *t, int ind)
 int edts(char *t, int ind)
 {
 	char info[1000];
-	strcpy(info, " edts");
-	strcpy(res[strind].name, info);
+	strcpy(res[strind].name, " edts");
 	res[strind].layer = 2;
 	strind++;
 	holder = ind;
@@ -561,8 +562,9 @@ int elst(char *t, int ind)
 {
 	char info[1000], tmp[1000];
 	if (strcmp(res[strind-1].name, " edts") != 0) {
-		holder += 2;
-		return holder;
+		strcpy(res[strind].name, info);
+		res[strind].layer = 2;
+		strind++;
 	}
 	strcpy(res[strind].name, " elst");
 	res[strind].layer = 3;
@@ -622,8 +624,9 @@ int mdhd(char *t, int ind)
 	int i = 0, j = 0;
 	long tmpnum;
 	if (strcmp(res[strind-1].name, " mdia") != 0) {
-		holder += 2;
-		return holder;
+		strcpy(res[strind].name, info);
+		res[strind].layer = 2;
+		strind++;
 	}
 	strcpy(res[strind].name, " mdhd");
 	strcpy(info, "Box Version: ");
@@ -765,10 +768,6 @@ int minf(char *t, int ind)
 
 int vmhd(char *t, int ind)
 {
-	if (strcmp(res[strind-1].name, " minf") != 0) {
-		holder += 2;
-		return holder;
-	}
 	char info[100], tmp[100];
 	strcpy(res[strind].name, " vmhd");
 	res[strind].layer = 4;
@@ -861,13 +860,11 @@ int nmhd(char *t, int ind)
 
 int dinf(char *t, int ind)
 {
-	if (strcmp(res[strind-1].name, " minf") != 0 ||
-	strcmp(res[strind-1].name, " vmhd") != 0 ||
-	strcmp(res[strind-1].name, " smhd") != 0 ||
-	strcmp(res[strind-1].name, " hmhd") != 0 ||
-	strcmp(res[strind-1].name, " nmhd") != 0) {
-		holder += 2;
-		return holder;
+	if (strcmp(res[strind-1].name , " minf") != 0 ||
+	strcmp(res[strind-2].name, " minf") != 0 ) {
+		strcpy(res[strind].name, " minf");
+		res[strind].layer = 2;
+		strind++;
 	}
 	char info[100];
 	strcpy(res[strind].name, " dinf");
