@@ -862,9 +862,8 @@ int dinf(char *t, int ind)
 {
 	if (strcmp(res[strind-1].name , " minf") != 0 ||
 	strcmp(res[strind-2].name, " minf") != 0 ) {
-		strcpy(res[strind].name, " minf");
-		res[strind].layer = 2;
-		strind++;
+		holder += 2;
+		return holder;
 	}
 	char info[100];
 	strcpy(res[strind].name, " dinf");
