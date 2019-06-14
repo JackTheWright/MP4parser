@@ -21,8 +21,6 @@ struct node res[SIZE_OF_STRUCT];
 
 char str[2000000000];
 
-#define MAXSIZE 2000000000
-
 int MP4Parser(char *s); //struct node *keywordlink);
 int keywordcaller(char *s, char *t, int index);
 int ftype(char *t, int ind);
@@ -63,12 +61,12 @@ void itob(int n, char s[], int base);
 int strind = 0;
 int holder = 0;
 
-int main()
+struct node *main()
 {
 	FILE *fp;
 	int c;
 
-	const char *filename = "Sample2.mp4";
+	const char *filename = "test3";
 	fp = fopen(filename,"rb");
 	if (fp == NULL) {
 	    perror("Error opening file");
@@ -92,11 +90,6 @@ int main()
 			str[i] = tmpr[1];
 			str[i+1] = tmpr[0];
 		}
-		// option 1 end
-
-		// option 2
-		// sprintf(line+i,"%02x",c);	// works but slow
-		// option 2 end
 
 		i+=2;
 	} while(1 && i < 2000000000);
@@ -104,13 +97,11 @@ int main()
 		printf("Error input too large\n");
 		return 0;
 	}
-	// printf("%s\n",str);
 	long long j = 0, k = 0, tmper = 0, infolen = 0, count = 1;
 	int num, hld, letrflg = 0, remain = 0;
 	long long len = (long long)strlen(str);
 	char str2[10000], info[1000000] = "", tmp[10000];
 	while (j < len) {
-		//printf("let me guaess not getting in\n");
 		while (count < 4) {
 			if (str[j] != '0') {
 				str2[k++] = str[j++];
@@ -129,12 +120,10 @@ int main()
 			} else if (remain == 0) {
 				j = j + 8;
 				count = 0;
-				//printf("j: %lld\n", j);
 				break;
 			} else if (remain != 0) {
 				j = j + remain;
 				remain = 8;
-				//printf("j: %lld\n", j);
 				count = 0;
 				break;
 			}
@@ -143,7 +132,7 @@ int main()
 		j = keywordcaller(info, str, j);
 		if (j == -1) {
 			print_struct(res);
-			return 0;
+			return res;
 		}
 		if (j > hld)
 			remain = j % 8;
@@ -152,7 +141,7 @@ int main()
 		info[0] = '\0';
 		count = 0;
 	}
-	return 0;
+	return res;
 }
 
 void itob(int n, char s[], int base)
@@ -254,10 +243,8 @@ int keywordcaller(char *s, char *t, int ind)
 
 int ftype(char *t, int ind)
 {
-	//layer 0
 	char info[1000], tmp[100], tmp2[100], tmp3[100];
-	strcpy(info, " ftype");
-	strcpy(res[strind].name, info);
+	strcpy(res[strind].name, " ftype");
 	strcpy(info, "Major Brand: ");
 	int tmpnum, i = 0, j = 0, k = 0, count = 1, flag = 0;
 	while (j < 8) {
@@ -294,11 +281,9 @@ int ftype(char *t, int ind)
 		if (flag == 1)
 			break;
 	}
-	//printf("%s\n", info);
 	strcpy(res[strind].description, info);
 	res[strind].layer = 0;
 	strind++;
-	// printf("ind: %d\n", ind);
 	holder = ind;
 	return ind + 8;
 
@@ -306,15 +291,12 @@ int ftype(char *t, int ind)
 
 int moov(char *t, int ind)
 {
-	//layer 0
 	char info[100];
 	strcpy(info, " moov");
-	//printf("%s\n", info);
 	strcpy(res[strind].name, info);
 	strcpy(res[strind].description, "");
 	res[strind].layer = 0;
 	strind++;
-	// printf("ind: %d\n", ind);
 	holder = ind;
 	return ind + 8;
 }
@@ -420,27 +402,22 @@ int mvhd(char *t, int ind)
 	strcpy(res[strind].description, info);
 	res[strind].layer = 1;
 	strind++;
-	//printf("%s\n", info);
-	//printf("ind: %d\n", ind);
 	holder = ind;
 	return ind;
 }
 
 int trak(char *t, int ind)
 {
-	//layer 1
 	char info[100];
 	strcpy(res[strind].name, " trak");
 	res[strind].layer = 1;
 	strind++;
-	// printf("ind: %d\n", ind);
 	holder = ind;
 	return ind + 8;
 }
 
 int tkhd(char *t, int ind)
 {
-	//layer 2
 	if (strcmp(res[strind-1].name, " trak") != 0) {
 		strcpy(res[strind].name, " trak");
 		res[strind].layer = 1;
@@ -539,11 +516,9 @@ int tkhd(char *t, int ind)
 	tmpnum = (long)strtol(tmp, NULL,16);
 	sprintf(tmp, "Height: %ld\n", tmpnum);
 	strcat(info, tmp);
-	//printf("%s\n", info);
 	strcpy(res[strind].description, info);
 	res[strind].layer = 2;
 	strind++;
-	//printf("ind: %d\n", ind);
 	holder = ind;
 	if (ind % 8 != 0)
 		return ind + 4;
@@ -552,7 +527,6 @@ int tkhd(char *t, int ind)
 
 int tref(char *t, int ind)
 {
-	//layer 2
 	char info[1000], tmp[1000];
 	int tmpnum, i = 0, j = 0;
 	strcpy(info, " tref");
@@ -568,28 +542,23 @@ int tref(char *t, int ind)
 	strcat(info, tmp);
 	strcpy(res[strind].description, info);
 	strind++;
-	// printf("ind: %d\n", ind);
 	holder = ind;
 	return ind + 8;
 }
 
 int edts(char *t, int ind)
 {
-	//layer 2
 	char info[1000];
 	strcpy(info, " edts");
 	strcpy(res[strind].name, info);
 	res[strind].layer = 2;
 	strind++;
-	//printf("%s\n", info);
-	// printf("ind: %d\n", ind);
 	holder = ind;
 	return ind + 8;
 }
 
 int elst(char *t, int ind)
 {
-	//layer 3
 	char info[1000], tmp[1000];
 	if (strcmp(res[strind-1].name, " edts") != 0) {
 		holder += 2;
@@ -630,38 +599,25 @@ int elst(char *t, int ind)
 	tmpnum = (long)strtol(tmp, NULL, 16);
 	sprintf(tmp, "Media Rate: %ld\n", tmpnum);
 	strcat(info, tmp);
-	//printf("%s\n", info);
 	strcpy(res[strind].description, info);
 	strind++;
-	//printf("ind: %d\n", ind);
-	// if (ind % 8 != 0) {
-	// 	return (ind - (8 - ind % 8));
-	// }
 	holder = ind;
-	return ind + 4;
+	return ind;
 }
 
 int mdia(char *t, int ind)
 {
-	//layer 2
-	if (strcmp(res[strind-1].name, " tkhd") != 0) {
-		holder += 2;
-		return holder;
-	}
 	char info[100];
 	strcpy(info, " mdia");
 	strcpy(res[strind].name, info);
 	res[strind].layer = 2;
 	strind++;
-	//printf("%s\n", info);
-	// printf("ind: %d\n", ind);
 	holder = ind;
 	return ind + 8;
 }
 
 int mdhd(char *t, int ind)
 {
-	//layer 3
 	char info[100], tmp[100];
 	int i = 0, j = 0;
 	long tmpnum;
@@ -740,7 +696,6 @@ int mdhd(char *t, int ind)
 		sprintf(tmp, "Duration: %ld\n", tmpnum);
 		strcat(info, tmp);
 	}
-	//printf("%s\n", info);
 	strcpy(res[strind].description, info);
 	res[strind].layer = 3;
 	strind++;
@@ -750,7 +705,6 @@ int mdhd(char *t, int ind)
 
 int hdlr(char *t, int ind)
 {
-	//layer 3
 	if (strcmp(res[strind-1].name, " mdhd") != 0) {
 		holder += 2;
 		return holder;
@@ -788,18 +742,15 @@ int hdlr(char *t, int ind)
 		strcat(info, tmp3);
 		k=0;
 	}
-	//printf("%s\n", info);
 	strcat(info, "\n");
 	strcpy(res[strind].description, info);
 	strind++;
-	// printf("ind: %d\n", ind);
 	holder = ind;
 	return ind + 8;
 }
 
 int minf(char *t, int ind)
 {
-	//layer 3
 	if (strcmp(res[strind-1].name, " hdlr") != 0) {
 		holder += 2;
 		return holder;
@@ -814,7 +765,10 @@ int minf(char *t, int ind)
 
 int vmhd(char *t, int ind)
 {
-	//layer 4
+	if (strcmp(res[strind-1].name, " minf") != 0) {
+		holder += 2;
+		return holder;
+	}
 	char info[100], tmp[100];
 	strcpy(res[strind].name, " vmhd");
 	res[strind].layer = 4;
@@ -827,16 +781,14 @@ int vmhd(char *t, int ind)
 	tmpnum = (int)strtol(tmp, NULL, 16);
 	sprintf(tmp, "Graphics Mode: %d\n", tmpnum);
 	strcat(info, tmp);
-	//printf("%s\n", info);
 	strcpy(res[strind].description, info);
 	strind++;
 	holder = ind;
-	return ind + 8;
+	return ind;
 }
 
 int smhd(char *t, int ind)
 {
-	//layer 4
 	char info[100], tmp[100];
 	strcpy(res[strind].name, " smhd");
 	res[strind].layer = 4;
@@ -848,7 +800,6 @@ int smhd(char *t, int ind)
 	tmpnum = (int)strtol(tmp, NULL, 16);
 	sprintf(tmp, "Balance: %d\n", tmpnum);
 	strcat(info, tmp);
-	//printf("%s\n", info);
 	strcpy(res[strind].description, info);
 	holder = ind;
 	strind++;
@@ -857,7 +808,6 @@ int smhd(char *t, int ind)
 
 int hmhd(char *t, int ind)
 {
-	//layer 4
 	char info[100], tmp[100];
 	strcpy(res[strind].name, " hmhd");
 	res[strind].layer = 4;
@@ -893,7 +843,6 @@ int hmhd(char *t, int ind)
 	tmpnum = (int)strtol(tmp, NULL, 16);
 	sprintf(tmp, "Average Bitrate: %d\n", tmpnum);
 	strcat(info, tmp);
-	//printf("%s\n", info);
 	strcpy(res[strind].description, info);
 	holder = ind;
 	strind++;
@@ -902,20 +851,21 @@ int hmhd(char *t, int ind)
 
 int nmhd(char *t, int ind)
 {
-	//layer 4
 	char info[100];
 	strcpy(res[strind].name, " nmhd");
 	res[strind].layer = 4;
 	strind++;
-	//printf("%s\n", info);
 	holder = ind;
 	return ind + 8;
 }
 
 int dinf(char *t, int ind)
 {
-	//layer 4
-	if (strcmp(res[strind-1].name, " dinf") != 0) {
+	if (strcmp(res[strind-1].name, " minf") != 0 ||
+	strcmp(res[strind-1].name, " vmhd") != 0 ||
+	strcmp(res[strind-1].name, " smhd") != 0 ||
+	strcmp(res[strind-1].name, " hmhd") != 0 ||
+	strcmp(res[strind-1].name, " nmhd") != 0) {
 		holder += 2;
 		return holder;
 	}
@@ -923,14 +873,12 @@ int dinf(char *t, int ind)
 	strcpy(res[strind].name, " dinf");
 	res[strind].layer = 4;
 	strind++;
-	//printf("%s\n", info);
 	holder = ind;
 	return ind + 8;
 }
 
 int dref(char *t, int ind)
 {
-	//layer 5
 	if (strcmp(res[strind-1].name , " dinf") != 0) {
 		strcpy(res[strind].name, " dinf");
 		res[strind].layer = 2;
@@ -946,19 +894,16 @@ int dref(char *t, int ind)
 
 int stbl(char *t, int ind)
 {
-	//layer 4
 	char info[100];
 	strcpy(res[strind].name, " stbl");
 	res[strind].layer = 4;
 	strind++;
-	//printf("%s\n", info);
 	holder = ind;
 	return ind + 8;
 }
 
 int stsd(char *t, int ind)
 {
-	//layer 5
 	char info[100], tmp[100];
 	if (strcmp(res[strind-1].name , " stbl") != 0) {
 		strcpy(res[strind].name, " stbl");
@@ -978,13 +923,11 @@ int stsd(char *t, int ind)
 	strcat(res[strind].description, tmp);
 	strind++;
 	holder = ind;
-	//printf("%s\n", info);
 	return ind + 8;
 }
 
 int stts(char *t, int ind)
 {
-	//layer 5
 	char info[100], tmp[100];
 	strcpy(res[strind].name, " stts");
 	res[strind].layer = 5;
@@ -997,7 +940,6 @@ int stts(char *t, int ind)
 	tmpnum = (int)strtol(tmp, NULL, 16);
 	sprintf(tmp, "Entry Count: %d\n", tmpnum);
 	strcat(info, tmp);
-	//printf("%s\n", info);
 	strcpy(res[strind].description, info);
 	strind++;
 	holder = ind;
@@ -1006,7 +948,6 @@ int stts(char *t, int ind)
 
 int stsc(char *t, int ind)
 {
-	//layer 5
 	char info[100], tmp[100];
 	strcpy(res[strind].name, " stsc");
 	res[strind].layer = 5;
@@ -1019,7 +960,6 @@ int stsc(char *t, int ind)
 	tmpnum = (int)strtol(tmp, NULL, 16);
 	sprintf(tmp, "Entry Count: %d\n", tmpnum);
 	strcat(info, tmp);
-	//printf("%s\n", info);
 	strcpy(res[strind].description, info);
 	strind++;
 	holder = ind;
@@ -1029,7 +969,6 @@ int stsc(char *t, int ind)
 
 int stco(char *t, int ind)
 {
-	//layer 5
 	char info[100], tmp[100];
 	strcpy(res[strind].name, " stco");
 	res[strind].layer = 5;
@@ -1042,7 +981,6 @@ int stco(char *t, int ind)
 	tmpnum = (int)strtol(tmp, NULL, 16);
 	sprintf(tmp, "Entry Count: %d\n", tmpnum);
 	strcat(info, tmp);
-	//printf("%s\n", info);
 	strcpy(res[strind].description, info);
 	strind++;
 	holder = ind;
@@ -1051,9 +989,7 @@ int stco(char *t, int ind)
 
 int mvex(char *t, int ind)
 {
-	//layer 1
 	char info[100];
-	//printf("%s\n", info);
 	strcpy(res[strind].name, " mvex");
 	res[strind].layer = 1;
 	strind++;
@@ -1063,7 +999,6 @@ int mvex(char *t, int ind)
 
 int trex(char *t, int ind)
 {
-	//layer 2
 	char info[100], tmp[100];
 	strcpy(res[strind].name, " trex");
 	res[strind].layer = 2;
@@ -1108,7 +1043,6 @@ int trex(char *t, int ind)
 	tmpnum = (int)strtol(tmp, NULL, 16);
 	sprintf(tmp, "Sample Flags: %d\n", tmpnum);
 	strcat(info, tmp);
-	//printf("%s\n", info);
 	strcpy(res[strind].description, info);
 	strind++;
 	holder = ind;
@@ -1117,19 +1051,16 @@ int trex(char *t, int ind)
 
 int moof(char *t, int ind)
 {
-	//layer 0
 	char info[100];
 	strcpy(res[strind].name, " moof");
 	res[strind].layer = 0;
 	strind++;
-	//printf("%s\n", info);
 	holder = ind;
 	return ind + 8;
 }
 
 int mfhd(char *t, int ind)
 {
-	//layer 1
 	char info[100], tmp[100];
 	strcpy(res[strind].name, " mfhd");
 	res[strind].layer = 1;
@@ -1142,7 +1073,6 @@ int mfhd(char *t, int ind)
 	tmpnum = (int)strtol(tmp, NULL, 16);
 	sprintf(tmp, "Sequence Number: %d\n", tmpnum);
 	strcat(info, tmp);
-	//printf("%s\n", info);
 	strcpy(res[strind].description, info);
 	strind++;
 	holder = ind;
@@ -1151,19 +1081,16 @@ int mfhd(char *t, int ind)
 
 int traf(char *t, int ind)
 {
-	//layer 1
 	char info[100];
 	strcpy(res[strind].name, " traf");
 	res[strind].layer = 1;
 	strind++;
-	//printf("%s\n", info);
 	holder = ind;
 	return ind + 8;
 }
 
 int tfhd(char *t, int ind)
 {
-	//layer 2
 	char info[100], tmp[100];
 	strcpy(res[strind].name, " tfhd");
 	res[strind].layer = 2;
@@ -1176,7 +1103,6 @@ int tfhd(char *t, int ind)
 	tmpnum = (int)strtol(tmp, NULL, 16);
 	sprintf(tmp, "Track ID: %d\n", tmpnum);
 	strcat(info, tmp);
-	//printf("%s\n", info);
 	strcpy(res[strind].description, info);
 	strind++;
 	holder = ind;
@@ -1185,19 +1111,16 @@ int tfhd(char *t, int ind)
 
 int mfra(char *t, int ind)
 {
-	//layer 0
 	char info[100];
 	strcpy(res[strind].name, " mfra");
 	res[strind].layer = 0;
 	strind++;
-	//printf("%s\n", info);
 	holder = ind;
 	return ind + 8;
 }
 
 int mfro(char *t, int ind)
 {
-	//layer 1
 	char info[100], tmp[100];
 	strcpy(res[strind].name, " mfro");
 	res[strind].layer = 1;
@@ -1210,7 +1133,6 @@ int mfro(char *t, int ind)
 	tmpnum = (int)strtol(tmp, NULL, 16);
 	sprintf(tmp, "Size: %d\n", tmpnum);
 	strcat(info, tmp);
-	//printf("%s\n", info);
 	strcpy(res[strind].description, info);
 	strind++;
 	holder = ind;
